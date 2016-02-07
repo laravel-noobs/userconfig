@@ -1,0 +1,21 @@
+{
+    "name": "koutsuneka/userconfig",
+    "description": "Laravel user configs repository base on session store.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kou Tsuneka",
+            "email": "tsuneka.kou@gmail.com"
+        }
+    ],
+    "require": {
+      "symfony/http-foundation": "2.8.*|3.0.*",
+      "illuminate/session": "5.2.*",
+      "illuminate/support": "5.2.*"
+    },
+    "autoload": {
+      "psr-4": {
+        "KouTsuneka\\UserConfig\\": "src/"
+      }
+  }
+}
