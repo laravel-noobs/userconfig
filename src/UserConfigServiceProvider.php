@@ -47,6 +47,6 @@ class UserConfigServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['user_config', 'App\Providers\UserConfigRepository'];
+        return ['uconfig', 'App\Providers\UserConfigRepository'];
     }
 }
