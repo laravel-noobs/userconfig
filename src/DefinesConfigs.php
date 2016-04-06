@@ -93,4 +93,31 @@ trait DefinesConfigs
 
         $this->write_config($input['name'], $input['value']);
     }
+
+    public function postConfigs(Request $request)
+    {
+        $input = $request->input();
+        if(!isset($input['configs']))
+            throw new BadRequestHttpException();
+        foreach($input['configs'] as $config)
+            if(!isset($config['name']) || !isset($config['value']))
+                throw new BadRequestHttpException();
+
+        foreach($input['configs'] as $config)
+        {
+            if($config['value'] === "NULL")
+                $config['value'] = null;
+
+            if(isset($this->configs_validate[$config['name']]))
+            {
+                $validator = Validator::make([$config['name'] => $config['value']],[
+                    $config['name'] => $this->configs_validate[$config['name']]
+                ]);
+                if($validator->fails())
+                    return Response::json($validator->errors()->all(), 400);
+            }
+
+            $this->write_config($config['name'], $config['value']);
+        }
+    }
 }
