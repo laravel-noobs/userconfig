@@ -12,7 +12,12 @@ trait DefinesConfigs
     {
         $configs = [];
         foreach(array_keys($this->configs) as $key)
-            $configs[$key] = UserConfig::get($this->config_key . '_' . $key);
+        {
+            $config = UserConfig::get($this->config_key . '_' . $key);
+            if($config != null)
+                $configs[$key] = $config;
+        }
+
         $this->configs = array_merge($this->configs, $configs);
     }
 
@@ -59,16 +64,20 @@ trait DefinesConfigs
         return $ret;
     }
 
-    protected function write_config($name, $value, $save = true)
+    protected function write_config($name, $value, $merge = false, $save = true)
     {
         $path = explode('.', $name);
         $temp = &$this->configs;
         foreach($path as $key) {
-            if(!array_has($temp,$key))
+            if(!array_has($temp, $key))
                 return;
             $temp = &$temp[$key];
         }
-        $temp = $value;
+        if($merge)
+            $temp = array_merge($temp, $value);
+        else
+            $temp = $value;
+
         unset($temp);
         $this->save_config($path[0]);
     }
@@ -82,6 +91,7 @@ trait DefinesConfigs
         if($input['value'] === "NULL")
             $input['value'] = null;
 
+
         if(isset($this->configs_validate[$input['name']]))
         {
             $validator = Validator::make([$input['name'] => $input['value']],[
@@ -91,7 +101,7 @@ trait DefinesConfigs
                 return Response::json($validator->errors()->all(), 400);
         }
 
-        $this->write_config($input['name'], $input['value']);
+        $this->write_config($input['name'], $input['value'], isset($input['merge']) ? $input['merge'] : false);
     }
 
     public function postConfigs(Request $request)
