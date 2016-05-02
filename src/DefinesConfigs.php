@@ -21,11 +21,14 @@ trait DefinesConfigs
         $this->configs = array_merge($this->configs, $configs);
     }
 
-    protected function load_config($key)
+    protected function load_config($key, $merge = true)
     {
         $config = UserConfig::get($this->config_key . '_' . $key);
         if($config != null)
-            $this->configs[$key] = array_merge($this->configs[$key], $config);
+            if($merge)
+                $this->configs[$key] = array_merge($this->configs[$key], $config);
+            else
+                $this->configs[$key] = $config;
     }
 
     protected function save_config($key)
@@ -44,7 +47,7 @@ trait DefinesConfigs
         $path = explode('.', $name);
 
         if($reload)
-            $this->load_config($path[0]);
+            $this->load_config($path[0], !$reload);
 
         $temp = $this->configs;
         foreach($path as $key)
