@@ -101,6 +101,18 @@ trait DefinesConfigs
                 return Response::json($validator->errors()->all(), 400);
         }
 
+        $rules = [];
+        foreach($this->configs_validate as $k => $v)
+            if(substr($k, 0, strlen($input['name'] . '.')) == $input['name'] . '.')
+                $rules[$k] = $v;
+
+        if(!empty($rules))
+        {
+            $validator = Validator::make([$input['name'] => $input['value']], $rules);
+            if($validator->fails())
+                return Response::json($validator->errors()->all(), 400);
+        }
+
         $this->write_config($input['name'], $input['value'], isset($input['merge']) ? $input['merge'] : false);
     }
 
@@ -123,6 +135,18 @@ trait DefinesConfigs
                 $validator = Validator::make([$config['name'] => $config['value']],[
                     $config['name'] => $this->configs_validate[$config['name']]
                 ]);
+                if($validator->fails())
+                    return Response::json($validator->errors()->all(), 400);
+            }
+
+            $rules = [];
+            foreach($this->configs_validate as $k => $v)
+                if(substr($k, 0, strlen($config['name'] . '.')) == $config['name'] . '.')
+                    $rules[$k] = $v;
+
+            if(!empty($rules))
+            {
+                $validator = Validator::make([$config['name'] => $config['value']], $rules);
                 if($validator->fails())
                     return Response::json($validator->errors()->all(), 400);
             }
